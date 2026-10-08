@@ -1,0 +1,85 @@
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+
+/* Визначаємо назви шарів для зручності читання коду */
+#define BASE 0
+#define NAV  1
+#define SYM  2
+#define ADJ  3
+
+/ {
+    /* Налаштування поведінки кнопок (Home Row Mods) */
+    behaviors {
+        hm: homerow_mods {
+            compatible = "zmk,behavior-hold-tap";
+            label = "HOMEROW_MODS";
+            #binding-cells = <2>;
+            tapping-term-ms = <200>; /* Час утримання (в мілісекундах), після якого літера стає модифікатором */
+            quick-tap-ms = <150>;    /* Дозволяє швидко друкувати подвійні літери без випадкового спрацьовування Shift/Ctrl */
+            flavor = "tap-preferred";
+            bindings = <&kp>, <&kp>;
+        };
+    };
+
+    /* Умова: якщо затиснуті шари NAV та SYM одночасно, активувати шар ADJ */
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+        tri_layer {
+            if-layers = <NAV SYM>;
+            then-layer = <ADJ>;
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        /* Шар 0: Базовий (Colemak-DH + модифікатори на домашньому ряду) */
+        default_layer {
+            bindings = <
+/* Ліва половина */
+&kp Q       &kp W      &kp F       &kp P       &kp B          /* Права половина */ &kp J       &kp L       &kp U       &kp Y       &kp SEMI
+&hm LGUI A  &hm LALT R &hm LCTRL S &hm LSHFT T &kp G                               &kp M       &hm RSHFT N &hm RCTRL E &hm RALT I  &hm RGUI O
+&kp Z       &kp X      &kp C       &kp D       &kp V                               &kp K       &kp H       &kp COMMA   &kp DOT     &kp FSLH
+            /* Великий палець */
+            &kp ESC    &kp TAB     &kp SPACE   &mo NAV                             &mo SYM     &kp BSPC    &kp RET     &kp DEL
+            >;
+        };
+
+        /* Шар 1: Навігація, Цифри та Медіа */
+        nav_layer {
+            bindings = <
+/* Лівий цифровий блок (Numpad) */
+&none       &kp N7     &kp N8      &kp N9      &none          /* Права навігація (Vim-style) */ &none       &kp C_BRI_UP &kp C_VOL_DN &kp C_VOL_UP &kp C_MUTE
+&kp N0      &kp N4     &kp N5      &kp N6      &none                                            &none       &kp LEFT     &kp DOWN     &kp UP       &kp RIGHT
+&none       &kp N1     &kp N2      &kp N3      &kp DOT                                          &none       &kp C_BRI_DN &kp C_PREV   &kp C_PP     &kp C_NEXT
+            /* Великий палець */
+            &trans     &trans      &trans      &trans                                           &trans      &trans       &trans       &trans
+            >;
+        };
+
+        /* Шар 2: Символи для програмування */
+        sym_layer {
+            bindings = <
+/* Ліва рука: Дужки та знаки */
+&kp EXCL    &kp AT     &kp LBRC    &kp RBRC    &kp PIPE       /* Права рука: Оператори */ &kp STAR    &kp LT       &kp GT       &kp PLUS    &kp EQUAL
+&kp HASH    &kp DLLR   &kp LPAR    &kp RPAR    &kp GRAVE                                  &kp AMPS    &kp MINUS    &kp UNDER    &kp COLON   &kp DQT
+&kp PRCNT   &kp CARET  &kp LBKT    &kp RBKT    &kp TILDE                                  &kp QMARK   &kp BSLH     &kp FSLH     &kp SQT     &kp DOT
+            /* Великий палець */
+            &trans     &trans      &trans      &trans                                     &trans      &trans       &trans       &trans
+            >;
+        };
+
+        /* Шар 3: Налаштування Bluetooth та F-клавіші */
+        adjust_layer {
+            bindings = <
+/* Ліва рука: Управління ZMK та Bluetooth */
+&bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4   /* Права рука: F-клавіші */ &kp F1      &kp F2       &kp F3       &kp F4      &kp F5
+&bt BT_CLR   &none        &none        &none        &none                                      &kp F6      &kp F7       &kp F8       &kp F9      &kp F10
+&bootloader  &sys_reset   &none        &none        &none                                      &kp F11     &kp F12      &none        &sys_reset  &bootloader
+             /* Великий палець */
+             &trans       &trans       &trans       &trans                                     &trans      &trans       &trans       &trans
+            >;
+        };
+    };
+};
