@@ -3,3 +3,5 @@ include:
     shield: supermini_split_left
   - board: nice_nano_v2
     shield: supermini_split_right
+  - board: nice_nano_v2
+    shield: settings_reset
